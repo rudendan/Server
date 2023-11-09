@@ -1,23 +1,24 @@
 package org.example;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        ServerService server = new ServerService(8081);
-        try {
 
-            Socket client = server.start();
-            ChatService chat = new ChatService(client);
-            chat.start();
-            System.out.println("Connection closed");
+        try (ServerSocket server = new ServerSocket(8081)) {
+            System.out.println("Server started and listening port 8081");
+            Socket client = server.accept();
+            System.out.println("Client with IP" + client.getInetAddress() + " connected");
+            ServerHandler handler = new ServerHandler(client);
+            handler.handleClient();
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            server.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
